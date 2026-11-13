@@ -6,119 +6,524 @@
 <meta name="theme-color" content="#202522">
 <title>PAINT STOCK | 模型塗料在庫管理</title>
 <style>
-:root{--bg:#f3f5f2;--panel:#fff;--ink:#202522;--muted:#707a73;--line:#e1e6e1;--green:#32765d;--green2:#e8f1eb;--warn:#a66b19;--danger:#b64242;--shadow:0 5px 20px #17251b0d}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;padding-bottom:calc(28px + env(safe-area-inset-bottom))}
-button,input,select{font:inherit}button{cursor:pointer} .app{max-width:760px;margin:auto;padding:18px 14px 30px}
-header{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 18px}.brand{font-size:22px;font-weight:850;letter-spacing:.07em}.sub{font-size:10px;letter-spacing:.15em;color:var(--muted);margin-top:3px}.pill{font-size:10px;color:var(--green);background:var(--green2);border-radius:99px;padding:7px 10px;font-weight:750}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:12px;box-shadow:var(--shadow)}.stat small{display:block;color:var(--muted);font-size:11px}.stat strong{display:block;font-size:25px;margin-top:3px;font-variant-numeric:tabular-nums}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}.tab,.btn{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;color:var(--ink);font-weight:700}.tab.active,.btn.primary{background:var(--green);border-color:var(--green);color:white}.btn.danger{color:var(--danger);border-color:#e9caca;background:#fff}.btn.small{padding:8px 10px;font-size:12px;border-radius:9px}.panel,.paint{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow);margin-bottom:11px}
-h2{font-size:17px;margin:2px 0 12px}.field{margin:12px 0}.field label{display:block;font-size:12px;font-weight:750;margin-bottom:6px}.field input,.field select,.search{width:100%;border:1px solid #d9dfd9;border-radius:10px;padding:12px;background:#fff;color:var(--ink);min-height:44px;outline:none}.field input:focus,.field select:focus,.search:focus{border-color:var(--green);box-shadow:0 0 0 3px #32765d1c}
-.colorline{display:flex;gap:10px;align-items:center}.colorline input[type=color]{width:58px;height:48px;padding:3px;border:1px solid var(--line);border-radius:10px;background:white}.swatch{width:58px;height:58px;border:1px solid #0002;border-radius:12px;flex:none;display:grid;place-items:center;font-size:10px;font-weight:800;text-shadow:0 1px 2px #fff8}
-.rangehead{display:flex;align-items:center;justify-content:space-between;font-weight:750}.rangehead strong{font-size:24px;font-variant-numeric:tabular-nums}.range{width:100%;accent-color:var(--green);margin:12px 0 4px}.rangeends{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
-.countrow{display:flex;align-items:center;justify-content:space-between;gap:12px}.stepper{display:flex;align-items:center;gap:12px}.stepper button{width:38px;height:38px;border:1px solid var(--line);background:white;border-radius:11px;font-size:20px}.stepper strong{min-width:28px;text-align:center;font-size:22px;font-variant-numeric:tabular-nums}
+:root{--bg:#f3f5f2;--panel:#fff;--ink:#202522;--muted:#778078;--line:#e1e6e1;--green:#32765d;--warn:#a66b19;--danger:#b64242}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;padding-bottom:28px}
+button,input,select{font:inherit}button{cursor:pointer}.app{max-width:780px;margin:auto;padding:13px 10px 25px}
+header{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 12px}.brand{font-size:19px;font-weight:850;letter-spacing:.07em}.sub{font-size:9px;letter-spacing:.15em;color:var(--muted);margin-top:2px}.pill{font-size:9px;color:var(--green);background:#e8f1eb;border-radius:99px;padding:6px 9px;font-weight:750}
+.btn{border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fff;color:var(--ink);font-weight:700;font-size:12px}.btn.primary{background:var(--green);border-color:var(--green);color:#fff}.btn.danger{color:var(--danger);border-color:#e9caca}
+.topadd{display:flex;align-items:center;gap:9px}.topadd .btn{padding:8px 12px}
+.searchrow{display:flex;gap:7px;margin-bottom:8px}.search{flex:1;min-width:0;width:100%;border:1px solid #d9dfd9;border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink);min-height:42px;outline:none;font-size:13px}.sort{border:1px solid var(--line);border-radius:10px;padding:0 7px;background:#fff;font-size:11px}
+.filters{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}.filters button{white-space:nowrap;border:1px solid var(--line);border-radius:99px;background:#fff;padding:7px 10px;font-size:11px;font-weight:700}.filters button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filtertools{display:flex;gap:7px;margin-bottom:9px}.filtertools .btn{flex:1;padding:8px 6px;font-size:11px}
+.paintlist{display:grid;grid-template-columns:1fr;gap:7px}
+.paint{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:9px 10px}
+
+/* screenshot-like list layout */
+.painttop{display:flex;align-items:flex-start;gap:9px}
+
+/* 色見本：高さ37pxを維持した正方形 */
+.swatch{
+  width:37px;height:37px;
+  border:1px solid #0002;border-radius:8px;flex:none;
+  display:grid;place-items:center;font-size:8px;font-weight:800;overflow:hidden
+}
+.swatch img{width:100%;height:100%;object-fit:cover}
+
+.paintinfo{flex:1;min-width:0}
+.paintname{font-size:13px;font-weight:800;overflow-wrap:anywhere;line-height:1.3}.meta{font-size:10px;color:var(--muted);margin-top:3px}.typebadge{display:inline-block;margin-top:4px;background:#f0f2ef;border-radius:5px;padding:3px 6px;font-size:9px;color:#536057}
+
+/* 右側：本数だけ表示 */
+.inventory{text-align:right;white-space:nowrap;min-width:auto;padding-top:2px}
+.inventory strong{display:block;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.inventory small{display:none}
+
+/* 残量：短いバー、開始位置は塗料名の文字頭（= paintinfo左端）に揃える */
+.bar{
+  height:4px;border-radius:99px;background:#edf0ed;overflow:hidden;
+  margin-top:7px;
+  margin-left:46px;   /* 37px swatch + 9px gap */
+  max-width:210px;    /* 短いバー */
+}
+.bar span{display:block;height:100%;border-radius:99px;background:var(--green)}.bar span.low{background:#c18a36}
+
+/* バー下の「在庫あり」表示を削除（= フッター行自体を非表示） */
+.paintfoot{display:none!important}
+
+.panel{background:#fff;border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:10px}h2{font-size:16px;margin:2px 0 12px}.field{margin:11px 0}.field label{display:block;font-size:12px;font-weight:750;margin-bottom:6px}.field input:not([type=range]):not([type=color]),.field select{width:100%;border:1px solid #d9dfd9;border-radius:10px;padding:11px;background:#fff;color:var(--ink);min-height:43px;outline:none;font-size:13px}.field input:focus,.field select:focus{border-color:var(--green)}
+.colorline{display:flex;gap:9px;align-items:center}.colorline input[type=color]{width:52px;height:44px;padding:3px;border:1px solid var(--line);border-radius:9px;background:white}
+.rangehead{display:flex;align-items:center;justify-content:space-between;font-weight:750}.rangehead strong{font-size:22px;font-variant-numeric:tabular-nums}.range{width:100%;accent-color:var(--green);margin:10px 0 3px}.rangeends{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
+.countrow{display:flex;align-items:center;justify-content:space-between;gap:12px}.stepper{display:flex;align-items:center;gap:11px}.stepper button{width:34px;height:34px;border:1px solid var(--line);background:white;border-radius:9px;font-size:19px}.stepper strong{min-width:25px;text-align:center;font-size:20px}
 .actions{display:flex;gap:8px;flex-wrap:wrap}.actions .btn{flex:1}
-.filters{display:flex;gap:7px;overflow-x:auto;padding:2px 0 9px;scrollbar-width:none}.filters button{white-space:nowrap;border:1px solid var(--line);border-radius:99px;background:#fff;padding:8px 12px;font-size:12px;font-weight:700}.filters button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
-.searchrow{display:flex;gap:8px;margin-bottom:10px}.searchrow .search{flex:1;min-width:0}.sort{border:1px solid var(--line);border-radius:10px;padding:0 8px;background:#fff;font-size:12px}
-.painttop{display:flex;align-items:center;gap:12px}.paintinfo{flex:1;min-width:0}.paintname{font-size:15px;font-weight:800;overflow-wrap:anywhere}.meta{font-size:11px;color:var(--muted);margin-top:4px}.typebadge{display:inline-block;margin-top:6px;background:#f0f2ef;border-radius:6px;padding:4px 7px;font-size:10px;color:#536057}.inventory{text-align:right;white-space:nowrap}.inventory strong{display:block;font-size:20px;font-variant-numeric:tabular-nums}.inventory small{color:var(--muted);font-size:11px}.bar{height:7px;border-radius:99px;background:#edf0ed;overflow:hidden;margin-top:12px}.bar span{display:block;height:100%;border-radius:99px;background:var(--green)}.bar span.low{background:#c18a36}.paintfoot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px}.status{font-size:10px;font-weight:800;color:var(--green)}.status.low{color:var(--warn)}.status.none{color:var(--danger)}.empty{text-align:center;color:var(--muted);padding:28px 10px;font-size:13px}
-.note{font-size:11px;line-height:1.7;color:var(--muted)}.hidden{display:none!important}.backupgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.backupgrid button{width:100%}.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#202522;color:#fff;padding:11px 16px;border-radius:99px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:10;white-space:nowrap}.toast.show{opacity:1}
-footer{text-align:center;color:#9aa29b;font-size:10px;letter-spacing:.12em;margin:22px 0 5px}
-@media(min-width:600px){.app{padding:26px 22px}.paintlist{display:grid;grid-template-columns:1fr 1fr;gap:10px}.paint{margin:0}.paint .paintname{font-size:16px}}
+.photo-box{border:1px dashed #cbd4cc;border-radius:12px;padding:10px;background:#fafcf9}.photo-preview{width:100%;max-height:210px;object-fit:contain;border-radius:9px;display:block;background:#eef1ee}.photo-preview.detail{max-height:390px;cursor:zoom-in}.photo-placeholder{padding:24px 8px;text-align:center;color:var(--muted);font-size:12px}.photo-actions{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}.photo-actions label{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:9px;padding:8px 11px;background:#fff;font-size:11px;font-weight:700;cursor:pointer}.photo-actions input{display:none}
+.hidden{display:none!important}.empty{text-align:center;color:var(--muted);padding:25px 10px;font-size:12px}.note{font-size:10px;line-height:1.7;color:var(--muted)}footer{text-align:center;color:#9aa29b;font-size:9px;letter-spacing:.12em;margin:18px 0 5px}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#202522;color:#fff;padding:10px 15px;border-radius:99px;font-size:11px;opacity:0;pointer-events:none;transition:.2s;z-index:20;white-space:nowrap}.toast.show{opacity:1}
+.modal{position:fixed;inset:0;background:#101512eF;display:flex;align-items:center;justify-content:center;padding:15px;z-index:30}.modal img{max-width:100%;max-height:88vh;object-fit:contain;border-radius:8px}.modal button{position:absolute;top:calc(12px + env(safe-area-inset-top));right:14px;background:#fff;border:0;border-radius:50%;width:38px;height:38px;font-size:20px}
+@media(min-width:620px){.app{padding:20px}.paintlist{grid-template-columns:1fr 1fr;gap:8px}.paint{padding:10px}.paintname{font-size:14px}}
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><div class="brand">PAINT STOCK</div><div class="sub">MODEL PAINT INVENTORY</div></div><span class="pill">LOCAL STORAGE</span></header>
-<section class="stats">
- <div class="stat"><small>登録種類</small><strong id="statKinds">0</strong></div>
- <div class="stat"><small>総本数</small><strong id="statBottles">0</strong></div>
- <div class="stat"><small>残量少・20％以下</small><strong id="statLow">0</strong></div>
-</section>
-<nav class="tabs"><button class="tab active" data-page="list">在庫一覧</button><button class="tab" data-page="form">＋ 塗料を登録</button></nav>
+<header>
+  <div>
+    <div class="brand">PAINT STOCK</div>
+    <div class="sub">MODEL PAINT INVENTORY</div>
+  </div>
+  <div class="topadd">
+    <span class="pill">LOCAL STORAGE</span>
+    <button class="btn primary" id="newPaint">＋ 登録</button>
+  </div>
+</header>
 
 <section id="listPage">
- <div class="searchrow"><input class="search" id="search" placeholder="塗料名・メーカー・色番号で検索"><select class="sort" id="sort"><option value="new">登録順</option><option value="low">残量が少ない順</option><option value="name">名前順</option></select></div>
- <div class="filters" id="filters"></div>
- <div class="actions" style="margin-bottom:11px"><button class="btn small" id="lowToggle">残量20％以下を表示</button><button class="btn small" id="resetFilters">絞り込み解除</button></div>
- <div id="paintList" class="paintlist"></div>
+  <div class="searchrow">
+    <input class="search" id="search" placeholder="塗料名・メーカー・色番号で検索">
+    <select class="sort" id="sort">
+      <option value="new">登録順</option>
+      <option value="name">名前順</option>
+      <option value="low">残量順</option>
+      <option value="type">種別順</option>
+      <option value="brand">メーカー順</option>
+    </select>
+  </div>
+  <div class="filters" id="filters"></div>
+  <div class="filtertools">
+    <button class="btn" id="lowToggle">残量20％以下</button>
+    <button class="btn" id="resetFilters">絞り込み解除</button>
+  </div>
+  <div id="paintList" class="paintlist"></div>
 </section>
 
 <section id="formPage" class="hidden">
- <div class="panel">
-  <h2 id="formTitle">塗料を新規登録</h2>
-  <div class="field"><label>色見本</label><div class="colorline"><input type="color" id="color" value="#808080"><input id="hex" value="#808080" maxlength="7" aria-label="HEXカラーコード"></div></div>
-  <div class="field"><label for="name">塗料名・色名 *</label><input id="name" placeholder="例：シャインレッド" maxlength="80"></div>
-  <div class="field"><label for="brand">メーカー</label><select id="brand"><option>GSIクレオス</option><option>タミヤ</option><option>ガイアノーツ</option><option>フィニッシャーズ</option><option>AK Interactive</option><option>その他</option></select></div>
-  <div class="field"><label for="code">色番号・品番</label><input id="code" placeholder="例：C3 / X-7" maxlength="40"></div>
-  <div class="field"><label for="type">塗料の種類</label><select id="type"></select></div>
-  <div class="field"><div class="countrow"><label>在庫本数</label><div class="stepper"><button type="button" id="minus">−</button><strong id="countValue">1</strong><button type="button" id="plus">＋</button></div></div><input class="range" type="range" id="count" min="0" max="30" step="1" value="1" aria-label="在庫本数"></div>
-  <div class="field"><div class="rangehead"><label for="remaining">残量</label><strong id="remainingValue">100％</strong></div><input class="range" type="range" id="remaining" min="0" max="100" step="5" value="100"><div class="rangeends"><span>0％</span><span>50％</span><span>100％</span></div></div>
-  <div class="actions"><button class="btn primary" id="save">登録する</button><button class="btn" id="cancel">キャンセル</button></div>
-  <p class="note">本数と残量は独立して管理します。一覧では「2本 ＋ 80％」の形式で表示します。残量は登録した塗料全体の目安です。</p>
- </div>
+  <div class="panel">
+    <div class="actions" style="justify-content:space-between;align-items:center">
+      <h2 id="formTitle">塗料を新規登録</h2>
+      <button class="btn" id="cancel">一覧へ戻る</button>
+    </div>
+
+    <div class="field">
+      <label>塗料の写真（任意）</label>
+      <div class="photo-box" id="formPhotoBox">
+        <div class="photo-placeholder" id="formPhotoPlaceholder">ボトル・ラベル・色見本などの写真を保存できます</div>
+        <img id="formPhotoPreview" class="photo-preview hidden" alt="塗料写真">
+      </div>
+      <div class="photo-actions">
+        <label>写真を撮影・選択<input type="file" id="formPhoto" accept="image/*" capture="environment"></label>
+        <button class="btn" type="button" id="removeFormPhoto">写真を削除</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>色見本カラー</label>
+      <div class="colorline">
+        <input type="color" id="color" value="#808080">
+        <input id="hex" value="#808080" maxlength="7" aria-label="HEXカラーコード">
+      </div>
+    </div>
+
+    <div class="field"><label for="name">塗料名・色名 *</label><input id="name" placeholder="例：シャインレッド" maxlength="80"></div>
+    <div class="field"><label for="brand">メーカー</label><select id="brand"></select></div>
+    <div class="field"><label for="code">色番号・品番</label><input id="code" placeholder="例：C3 / X-7" maxlength="40"></div>
+    <div class="field"><label for="type">種類</label><select id="type"></select></div>
+
+    <div class="field">
+      <div class="countrow">
+        <label>在庫本数</label>
+        <div class="stepper">
+          <button type="button" id="minus">−</button>
+          <strong id="countValue">1</strong>
+          <button type="button" id="plus">＋</button>
+        </div>
+      </div>
+      <input class="range" type="range" id="count" min="0" max="30" step="1" value="1">
+    </div>
+
+    <div class="field">
+      <div class="rangehead"><label for="remaining">残量</label><strong id="remainingValue">100％</strong></div>
+      <input class="range" type="range" id="remaining" min="0" max="100" step="5" value="100">
+      <div class="rangeends"><span>0％</span><span>50％</span><span>100％</span></div>
+    </div>
+
+    <div class="actions"><button class="btn primary" id="save">登録する</button></div>
+    <p class="note">本数と残量は独立して管理します。</p>
+  </div>
 </section>
 
 <section id="detailPage" class="hidden">
- <div class="panel">
-  <div class="actions" style="justify-content:space-between;margin-bottom:12px"><h2 style="margin:8px 0" id="detailTitle">塗料詳細</h2><button class="btn small" id="back">一覧へ戻る</button></div>
-  <div id="detailPreview" style="display:flex;gap:12px;align-items:center;margin-bottom:16px"></div>
-  <div class="field"><label>塗料名・色名 *</label><input id="dName"></div>
-  <div class="field"><label>メーカー</label><select id="dBrand"><option>GSIクレオス</option><option>タミヤ</option><option>ガイアノーツ</option><option>フィニッシャーズ</option><option>AK Interactive</option><option>その他</option></select></div>
-  <div class="field"><label>色番号・品番</label><input id="dCode"></div>
-  <div class="field"><label>色見本カラー</label><div class="colorline"><input type="color" id="dColor"><input id="dHex" maxlength="7"></div></div>
-  <div class="field"><label>塗料の種類</label><select id="dType"></select></div>
-  <div class="field"><div class="countrow"><label>在庫本数</label><div class="stepper"><button type="button" id="dMinus">−</button><strong id="dCountValue">1</strong><button type="button" id="dPlus">＋</button></div></div><input class="range" type="range" id="dCount" min="0" max="30" step="1"></div>
-  <div class="field"><div class="rangehead"><label>残量</label><strong id="dRemainingValue">100％</strong></div><input class="range" type="range" id="dRemaining" min="0" max="100" step="5"><div class="rangeends"><span>0％</span><span>50％</span><span>100％</span></div></div>
-  <div class="actions"><button class="btn primary" id="update">変更を保存</button><button class="btn danger" id="delete">この塗料を削除</button></div>
- </div>
+  <div class="panel">
+    <div class="actions" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h2 id="detailTitle">塗料詳細</h2>
+      <button class="btn" id="back">一覧へ戻る</button>
+    </div>
+
+    <div id="detailPhotoWrap" class="photo-box" style="margin-bottom:14px">
+      <div class="photo-placeholder" id="detailPhotoPlaceholder">写真は登録されていません</div>
+      <img id="detailPhoto" class="photo-preview detail hidden" alt="塗料写真" title="タップして拡大">
+    </div>
+    <div class="photo-actions" style="margin-top:-6px;margin-bottom:12px">
+      <label>写真を撮影・変更<input type="file" id="detailPhotoInput" accept="image/*" capture="environment"></label>
+      <button class="btn" id="removeDetailPhoto">写真を削除</button>
+    </div>
+
+    <div class="field"><label>塗料名・色名 *</label><input id="dName"></div>
+    <div class="field"><label>メーカー</label><select id="dBrand"></select></div>
+    <div class="field"><label>色番号・品番</label><input id="dCode"></div>
+
+    <div class="field">
+      <label>色見本カラー</label>
+      <div class="colorline"><input type="color" id="dColor"><input id="dHex" maxlength="7"></div>
+    </div>
+
+    <div class="field"><label>種類</label><select id="dType"></select></div>
+
+    <div class="field">
+      <div class="countrow">
+        <label>在庫本数</label>
+        <div class="stepper">
+          <button type="button" id="dMinus">−</button>
+          <strong id="dCountValue">1</strong>
+          <button type="button" id="dPlus">＋</button>
+        </div>
+      </div>
+      <input class="range" type="range" id="dCount" min="0" max="30" step="1">
+    </div>
+
+    <div class="field">
+      <div class="rangehead"><label>残量</label><strong id="dRemainingValue">100％</strong></div>
+      <input class="range" type="range" id="dRemaining" min="0" max="100" step="5">
+      <div class="rangeends"><span>0％</span><span>50％</span><span>100％</span></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="update">変更を保存</button>
+      <button class="btn danger" id="delete">この塗料を削除</button>
+    </div>
+  </div>
 </section>
 
-<section class="panel" style="margin-top:15px">
- <h2>データのバックアップ</h2>
- <div class="backupgrid"><button class="btn" id="export">バックアップを書き出す</button><button class="btn" id="importBtn">バックアップを復元</button></div>
- <input type="file" id="importFile" accept=".json,application/json" class="hidden">
- <p class="note">データはこのブラウザ内に自動保存されます。機種変更・ブラウザ変更・データ消去に備えて、定期的にバックアップを書き出してください。復元すると現在の在庫データはバックアップ内容に置き換わります。</p>
+<section class="panel" style="margin-top:12px">
+  <h2>データのバックアップ</h2>
+  <div class="actions">
+    <button class="btn" id="export">バックアップを書き出す</button>
+    <button class="btn" id="importBtn">バックアップを復元</button>
+  </div>
+  <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+  <p class="note">データと写真はこのブラウザ内に自動保存されます。機種変更・ブラウザ変更・データ消去に備えて、写真を含むバックアップを定期的に書き出してください。復元すると現在のデータは置き換わります。</p>
 </section>
+
 <footer>PAINT STOCK MANAGER</footer>
 </div>
+
 <div class="toast" id="toast"></div>
+<div class="modal hidden" id="photoModal">
+  <button id="closeModal" aria-label="閉じる">×</button>
+  <img id="modalImage" alt="塗料写真拡大">
+</div>
+
 <script>
-(()=>{
-'use strict';
-const KEY='paint-stock-v1';
-const TYPES=['ラッカー','アクリル','アクリジョン','水性','エナメル','スプレー','その他'];
+(()=>{'use strict';
+const KEY='paint-stock-v2';
+const TYPES=['ラッカー','アクリル絵の具','アクリジョン','水性カラー','エナメル','スプレー','接着剤','デカール','その他'];
+const BRANDS=['GSIクレオス','タミヤ','ガイアノーツ','フィニッシャーズ','AK Interactive','バンダイ','その他'];
+
 const $=id=>document.getElementById(id);
-let paints=[],editingId=null,activeType='すべて',onlyLow=false,detailId=null;
+let paints=[],activeType='すべて',onlyLow=false,detailId=null,formPhotoData='',detailPhotoData='';
+
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1900)}
-function saveData(){try{localStorage.setItem(KEY,JSON.stringify(paints));renderStats();}catch(e){toast('保存できません。空き容量を確認してください。')}}
-function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');paints=Array.isArray(v)?v.filter(valid):[]}catch(e){paints=[]}}
-function valid(p){return p&&Number.isInteger(p.id)&&typeof p.name==='string'&&typeof p.brand==='string'&&typeof p.code==='string'&&TYPES.includes(p.type)&&Number.isInteger(p.count)&&p.count>=0&&p.count<=30&&Number.isInteger(p.remaining)&&p.remaining>=0&&p.remaining<=100&&/^#[0-9a-fA-F]{6}$/.test(p.color)}
-function renderStats(){$('statKinds').textContent=paints.length;$('statBottles').textContent=paints.reduce((s,p)=>s+p.count,0);$('statLow').textContent=paints.filter(p=>p.count>0&&p.remaining<=20).length}
-function setPage(page){['list','form','detail'].forEach(p=>$(`${p}Page`).classList.toggle('hidden',p!==page));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(page==='list')renderList();window.scrollTo({top:0,behavior:'smooth'})}
-function renderFilters(){const all=['すべて',...TYPES];$('filters').innerHTML=all.map(t=>`<button class="${activeType===t?'active':''}" data-type="${esc(t)}">${esc(t)}</button>`).join('');$('filters').querySelectorAll('button').forEach(b=>b.onclick=()=>{activeType=b.dataset.type;renderFilters();renderList()})}
-function renderList(){renderStats();renderFilters();const q=$('search').value.trim().toLowerCase();let arr=paints.filter(p=>(activeType==='すべて'||p.type===activeType)&&(!onlyLow||(p.count>0&&p.remaining<=20))&&[p.name,p.brand,p.code].join(' ').toLowerCase().includes(q));const sort=$('sort').value;if(sort==='low')arr.sort((a,b)=>a.remaining-b.remaining);else if(sort==='name')arr.sort((a,b)=>a.name.localeCompare(b.name,'ja'));else arr.sort((a,b)=>b.id-a.id);
-$('paintList').innerHTML=arr.length?arr.map(p=>{const status=p.count===0?'欠品':p.remaining<=20?'残量少':'在庫あり';const cls=p.count===0?'none':p.remaining<=20?'low':'';return `<article class="paint" data-id="${p.id}"><div class="painttop"><div class="swatch" style="background:${p.color};color:${contrast(p.color)}">${esc(p.code||'色見本')}</div><div class="paintinfo"><div class="paintname">${esc(p.name)}</div><div class="meta">${esc(p.brand)} ／ ${esc(p.code)}</div><span class="typebadge">${esc(p.type)}</span></div><div class="inventory"><strong>${p.count}本 ＋ ${p.remaining}％</strong><small>${status}</small></div></div><div class="bar"><span class="${cls}" style="width:${p.remaining}%"></span></div><div class="paintfoot"><span class="status ${cls}">${status}</span><button class="btn small edit" data-id="${p.id}">詳細・編集</button></div></article>`}).join(''):'<div class="empty">該当する塗料はありません。<br>「＋ 塗料を登録」から追加できます。</div>';
-$('paintList').querySelectorAll('.edit').forEach(b=>b.onclick=()=>openDetail(Number(b.dataset.id)))}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(paints));}catch(e){toast('保存容量を超えました。写真サイズを小さくしてください。')}}
+function load(){try{const a=JSON.parse(localStorage.getItem(KEY)||'[]');paints=Array.isArray(a)?a.filter(p=>p&&Number.isInteger(p.id)&&typeof p.name==='string'):[]}catch(e){paints=[]}}
 function contrast(hex){const n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return (r*299+g*587+b*114)/1000>150?'#202522':'#fff'}
-function fillType(id){$(id).innerHTML=TYPES.map(t=>`<option>${t}</option>`).join('')}
-function resetForm(){editingId=null;$('formTitle').textContent='塗料を新規登録';$('save').textContent='登録する';$('name').value='';$('brand').value='GSIクレオス';$('code').value='';$('type').value='ラッカー';$('count').value=1;$('countValue').textContent='1';$('remaining').value=100;$('remainingValue').textContent='100％';setColor('color','hex','#808080')}
-function setColor(colorId,hexId,val){$(colorId).value=val;$(hexId).value=val}
-function readColor(colorId,hexId){let v=$(hexId).value.trim();if(!/^#[0-9a-fA-F]{6}$/.test(v))v=$(colorId).value;return v}
-function countSync(input,label){$(label).textContent=$(input).value}
-function remainSync(input,label){$(label).textContent=$(input).value+'％'}
-function formValues(prefix=''){const g=id=>$(prefix+id);return {name:g('name').value.trim(),brand:g('brand').value,code:g('code').value.trim(),type:g('type').value,count:Number(g('count').value),remaining:Number(g('remaining').value),color:readColor(prefix+'color',prefix+'hex')}}
-function openDetail(id){const p=paints.find(x=>x.id===id);if(!p)return;detailId=id;$('detailTitle').textContent=p.name;$('dName').value=p.name;$('dBrand').value=p.brand;$('dCode').value=p.code;$('dType').value=p.type;$('dCount').value=p.count;$('dCountValue').textContent=p.count;$('dRemaining').value=p.remaining;$('dRemainingValue').textContent=p.remaining+'％';setColor('dColor','dHex',p.color);$('detailPreview').innerHTML=`<div class="swatch" style="width:70px;height:70px;background:${p.color};color:${contrast(p.color)}">${esc(p.code||'色見本')}</div><div><b>${esc(p.name)}</b><div class="meta">${esc(p.brand)} ／ ${esc(p.type)}</div></div>`;setPage('detail')}
-function updateDetail(){const p=paints.find(x=>x.id===detailId);if(!p)return;const v={name:$('dName').value.trim(),brand:$('dBrand').value,code:$('dCode').value.trim(),type:$('dType').value,count:Number($('dCount').value),remaining:Number($('dRemaining').value),color:readColor('dColor','dHex')};if(!v.name){toast('塗料名を入力してください');return}Object.assign(p,v);saveData();toast('変更を保存しました');setPage('list')}
-function exportData(){const blob=new Blob([JSON.stringify({app:'PAINT STOCK',version:1,exportedAt:new Date().toISOString(),paints},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='paint-stock-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href);toast('バックアップを書き出しました')}
-function importData(file){const reader=new FileReader();reader.onload=()=>{try{const obj=JSON.parse(reader.result),arr=Array.isArray(obj)?obj:obj.paints;if(!Array.isArray(arr)||!arr.every(valid))throw Error();if(!confirm('現在の在庫データをバックアップ内容に置き換えます。よろしいですか？'))return;paints=arr;saveData();renderList();toast('バックアップを復元しました')}catch(e){toast('ファイル形式またはデータ内容が正しくありません')}};reader.readAsText(file)}
-function wireCount(input,label,minus,plus){$(input).addEventListener('input',()=>countSync(input,label));$(minus).onclick=()=>{$(input).value=Math.max(0,Number($(input).value)-1);countSync(input,label)};$(plus).onclick=()=>{$(input).value=Math.min(30,Number($(input).value)+1);countSync(input,label)}}
-fillType('type');fillType('dType');load();renderList();
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{if(b.dataset.page==='form')resetForm();setPage(b.dataset.page)});
-$('search').oninput=renderList;$('sort').onchange=renderList;$('lowToggle').onclick=()=>{onlyLow=!onlyLow;$('lowToggle').textContent=onlyLow?'全在庫を表示':'残量20％以下を表示';renderList()};$('resetFilters').onclick=()=>{activeType='すべて';onlyLow=false;$('search').value='';$('lowToggle').textContent='残量20％以下を表示';renderList()};
-wireCount('count','countValue','minus','plus');wireCount('dCount','dCountValue','dMinus','dPlus');$('remaining').oninput=()=>remainSync('remaining','remainingValue');$('dRemaining').oninput=()=>remainSync('dRemaining','dRemainingValue');
-$('color').oninput=()=>{$('hex').value=$('color').value};$('hex').onchange=()=>{if(/^#[0-9a-fA-F]{6}$/.test($('hex').value))$('color').value=$('hex').value;else $('hex').value=$('color').value};$('dColor').oninput=()=>{$('dHex').value=$('dColor').value};$('dHex').onchange=()=>{if(/^#[0-9a-fA-F]{6}$/.test($('dHex').value))$('dColor').value=$('dHex').value;else $('dHex').value=$('dColor').value};
-$('save').onclick=()=>{const p=formValues();if(!p.name){toast('塗料名を入力してください');return}paints.unshift({id:Date.now(),...p});saveData();toast('塗料を登録しました');resetForm();setPage('list')};$('cancel').onclick=()=>setPage('list');$('back').onclick=()=>setPage('list');$('update').onclick=updateDetail;$('delete').onclick=()=>{if(confirm('この塗料を削除しますか？')){paints=paints.filter(p=>p.id!==detailId);saveData();toast('削除しました');setPage('list')}};
-$('export').onclick=exportData;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>{if(e.target.files[0])importData(e.target.files[0]);e.target.value=''};
+function fillSelect(id,items){$(id).innerHTML=items.map(x=>`<option>${esc(x)}</option>`).join('')}
+
+function setPage(page){
+  ['list','form','detail'].forEach(p=>$(`${p}Page`).classList.toggle('hidden',p!==page));
+  if(page==='list')renderList();
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+
+function renderFilters(){
+  $('filters').innerHTML=['すべて',...TYPES].map(t=>`<button class="${activeType===t?'active':''}" data-type="${esc(t)}">${esc(t)}</button>`).join('');
+  $('filters').querySelectorAll('button').forEach(b=>b.onclick=()=>{activeType=b.dataset.type;renderFilters();renderList()})
+}
+
+function renderList(){
+  renderFilters();
+  const q=$('search').value.trim().toLowerCase();
+  let arr=paints.filter(p=>
+    (activeType==='すべて'||p.type===activeType) &&
+    (!onlyLow||(p.count>0&&p.remaining<=20)) &&
+    [p.name,p.brand,p.code].join(' ').toLowerCase().includes(q)
+  );
+
+  const sort=$('sort').value;
+  if(sort==='low') arr.sort((a,b)=>a.remaining-b.remaining);
+  else if(sort==='name') arr.sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+  else if(sort==='type') arr.sort((a,b)=>String(a.type||'').localeCompare(String(b.type||''),'ja') || (b.id-a.id));
+  else if(sort==='brand') arr.sort((a,b)=>String(a.brand||'').localeCompare(String(b.brand||''),'ja') || (b.id-a.id));
+  else arr.sort((a,b)=>b.id-a.id);
+
+  $('paintList').innerHTML = arr.length ? arr.map(p=>{
+    const cls = (p.remaining<=20 ? 'low' : '');
+    const swatch = p.photo
+      ? `<img src="${p.photo}" alt="">`
+      : `<span style="color:${contrast(p.color)}">${esc(p.code||'')}</span>`;
+
+    return `<article class="paint">
+      <div class="painttop">
+        <div class="swatch" style="background:${p.color}">${swatch}</div>
+
+        <div class="paintinfo">
+          <div class="paintname">${esc(p.name)}</div>
+          <div class="meta">${esc(p.brand)}${p.code?' ／ '+esc(p.code):''}</div>
+          <span class="typebadge">${esc(p.type)}</span>
+        </div>
+
+        <div class="inventory">
+          <strong>${p.count}本</strong>
+          <button class="btn edit" data-id="${p.id}">詳細・編集</button>
+        </div>
+      </div>
+
+      <div class="bar"><span class="${cls}" style="width:${p.remaining}%"></span></div>
+    </article>`;
+  }).join('') : '<div class="empty">該当する塗料はありません。<br>右上の「＋ 登録」から追加できます。</div>';
+
+  $('paintList').querySelectorAll('.edit').forEach(b=>b.onclick=()=>openDetail(Number(b.dataset.id)))
+}
+
+function resetForm(){
+  formPhotoData='';
+  $('formTitle').textContent='塗料を新規登録';
+  $('save').textContent='登録する';
+  $('name').value='';
+  $('brand').value=BRANDS[0];
+  $('code').value='';
+  $('type').value='ラッカー';
+  $('count').value=1;
+  $('countValue').textContent='1';
+  $('remaining').value=100;
+  $('remainingValue').textContent='100％';
+  setColor('color','hex','#808080');
+  showPhoto('formPhotoPreview','formPhotoPlaceholder','')
+}
+
+function setColor(c,h,v){$(c).value=v;$(h).value=v}
+function readColor(c,h){const v=$(h).value.trim();return /^#[0-9a-fA-F]{6}$/.test(v)?v:$(c).value}
+function showPhoto(imgId,placeholderId,data){$(imgId).src=data||'';$(imgId).classList.toggle('hidden',!data);$(placeholderId).classList.toggle('hidden',!!data)}
+
+function compressImage(file){
+  return new Promise((resolve,reject)=>{
+    if(!file.type.startsWith('image/'))return reject();
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const max=1100,scale=Math.min(1,max/Math.max(img.width,img.height));
+        const w=Math.round(img.width*scale),h=Math.round(img.height*scale);
+        const canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',.76))
+      };
+      img.onerror=reject;
+      img.src=reader.result
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file)
+  })
+}
+
+function handlePhoto(input,which){
+  const file=input.files&&input.files[0];
+  if(!file)return;
+  compressImage(file).then(data=>{
+    if(which==='form'){
+      formPhotoData=data;
+      showPhoto('formPhotoPreview','formPhotoPlaceholder',data)
+    }else{
+      detailPhotoData=data;
+      showPhoto('detailPhoto','detailPhotoPlaceholder',data)
+    }
+  }).catch(()=>toast('写真を読み込めませんでした'));
+  input.value=''
+}
+
+function openDetail(id){
+  const p=paints.find(x=>x.id===id);
+  if(!p)return;
+  detailId=id;
+  detailPhotoData=p.photo||'';
+  $('detailTitle').textContent=p.name;
+  $('dName').value=p.name;
+  $('dBrand').value=p.brand;
+  $('dCode').value=p.code;
+  $('dType').value=p.type;
+  $('dCount').value=p.count;
+  $('dCountValue').textContent=p.count;
+  $('dRemaining').value=p.remaining;
+  $('dRemainingValue').textContent=p.remaining+'％';
+  setColor('dColor','dHex',p.color);
+  showPhoto('detailPhoto','detailPhotoPlaceholder',detailPhotoData);
+  setPage('detail')
+}
+
+function wireCount(input,label,minus,plus){
+  $(input).oninput=()=>$(label).textContent=$(input).value;
+  $(minus).onclick=()=>{$(input).value=Math.max(0,Number($(input).value)-1);$(label).textContent=$(input).value};
+  $(plus).onclick=()=>{$(input).value=Math.min(30,Number($(input).value)+1);$(label).textContent=$(input).value}
+}
+function wirePhoto(input,which){$(input).onchange=()=>handlePhoto($(input),which)}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify({app:'PAINT STOCK',version:2,exportedAt:new Date().toISOString(),paints},null,2)],{type:'application/json'});
+  const a=document.createElement('a'),url=URL.createObjectURL(blob);
+  a.href=url;
+  a.download='paint-stock-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast('写真を含むバックアップを書き出しました')
+}
+
+function importData(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const obj=JSON.parse(r.result),a=Array.isArray(obj)?obj:obj.paints;
+      if(!Array.isArray(a)||!a.every(p=>
+        p&&Number.isInteger(p.id)&&typeof p.name==='string'&&
+        TYPES.includes(p.type)&&
+        Number.isInteger(p.count)&&p.count>=0&&p.count<=30&&
+        Number.isInteger(p.remaining)&&p.remaining>=0&&p.remaining<=100&&
+        /^#[0-9a-fA-F]{6}$/.test(p.color)&&
+        (!p.photo||typeof p.photo==='string')
+      )) throw Error();
+
+      if(!confirm('現在の在庫データをバックアップ内容に置き換えます。よろしいですか？'))return;
+      paints=a;
+      persist();
+      renderList();
+      toast('バックアップを復元しました')
+    }catch(e){
+      toast('ファイル形式またはデータ内容が正しくありません')
+    }
+  };
+  r.readAsText(file)
+}
+
+fillSelect('type',TYPES);
+fillSelect('dType',TYPES);
+fillSelect('brand',BRANDS);
+fillSelect('dBrand',BRANDS);
+
+load();
+renderList();
+
+$('newPaint').onclick=()=>{resetForm();setPage('form')};
+$('cancel').onclick=()=>setPage('list');
+$('back').onclick=()=>setPage('list');
+
+$('search').oninput=renderList;
+$('sort').onchange=renderList;
+
+$('lowToggle').onclick=()=>{
+  onlyLow=!onlyLow;
+  $('lowToggle').textContent=onlyLow?'全在庫を表示':'残量20％以下';
+  renderList()
+};
+
+$('resetFilters').onclick=()=>{
+  activeType='すべて';
+  onlyLow=false;
+  $('search').value='';
+  $('lowToggle').textContent='残量20％以下';
+  renderList()
+};
+
+wireCount('count','countValue','minus','plus');
+wireCount('dCount','dCountValue','dMinus','dPlus');
+
+$('remaining').oninput=()=>$('remainingValue').textContent=$('remaining').value+'％';
+$('dRemaining').oninput=()=>$('dRemainingValue').textContent=$('dRemaining').value+'％';
+
+$('color').oninput=()=>$('hex').value=$('color').value;
+$('hex').onchange=()=>{
+  if(/^#[0-9a-fA-F]{6}$/.test($('hex').value))$('color').value=$('hex').value;
+  else $('hex').value=$('color').value
+};
+
+$('dColor').oninput=()=>$('dHex').value=$('dColor').value;
+$('dHex').onchange=()=>{
+  if(/^#[0-9a-fA-F]{6}$/.test($('dHex').value))$('dColor').value=$('dHex').value;
+  else $('dHex').value=$('dColor').value
+};
+
+wirePhoto('formPhoto','form');
+wirePhoto('detailPhotoInput','detail');
+
+$('removeFormPhoto').onclick=()=>{formPhotoData='';showPhoto('formPhotoPreview','formPhotoPlaceholder','')};
+$('removeDetailPhoto').onclick=()=>{detailPhotoData='';showPhoto('detailPhoto','detailPhotoPlaceholder','')};
+
+$('save').onclick=()=>{
+  const name=$('name').value.trim();
+  if(!name){toast('塗料名を入力してください');return}
+  paints.unshift({
+    id:Date.now(),
+    name,
+    brand:$('brand').value,
+    code:$('code').value.trim(),
+    type:$('type').value,
+    count:Number($('count').value),
+    remaining:Number($('remaining').value),
+    color:readColor('color','hex'),
+    photo:formPhotoData
+  });
+  persist();
+  toast('塗料を登録しました');
+  setPage('list')
+};
+
+$('update').onclick=()=>{
+  const p=paints.find(x=>x.id===detailId);
+  if(!p)return;
+  const name=$('dName').value.trim();
+  if(!name){toast('塗料名を入力してください');return}
+  Object.assign(p,{
+    name,
+    brand:$('dBrand').value,
+    code:$('dCode').value.trim(),
+    type:$('dType').value,
+    count:Number($('dCount').value),
+    remaining:Number($('dRemaining').value),
+    color:readColor('dColor','dHex'),
+    photo:detailPhotoData
+  });
+  persist();
+  toast('変更を保存しました');
+  setPage('list')
+};
+
+$('delete').onclick=()=>{
+  if(confirm('この塗料を削除しますか？')){
+    paints=paints.filter(p=>p.id!==detailId);
+    persist();
+    toast('削除しました');
+    setPage('list')
+  }
+};
+
+$('detailPhoto').onclick=()=>{
+  if(!detailPhotoData)return;
+  $('modalImage').src=detailPhotoData;
+  $('photoModal').classList.remove('hidden')
+};
+$('closeModal').onclick=()=>$('photoModal').classList.add('hidden');
+$('photoModal').onclick=e=>{if(e.target===$('photoModal'))$('photoModal').classList.add('hidden')};
+
+$('export').onclick=exportData;
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=e=>{if(e.target.files[0])importData(e.target.files[0]);e.target.value=''};
+
 })();
 </script>
 </body>
