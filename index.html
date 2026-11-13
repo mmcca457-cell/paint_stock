@@ -375,8 +375,100 @@ function wireCount(input,label,minus,plus){
 }
 function wirePhoto(input,which){$(input).onchange=()=>handlePhoto($(input),which)}
 
+// ===== Backup compatibility layer (v1 -> future) =======================
+const BACKUP_APP = 'PAINT STOCK';
+const BACKUP_SCHEMA = 2; // 現時点の保存スキーマ（将来3,4...に上げる）
+
+function clampInt(v, min, max, fallback){
+  const n = Number(v);
+  if(!Number.isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, Math.round(n)));
+}
+
+function normalizeColor(v){
+  const s = String(v || '').trim();
+  return /^#[0-9a-fA-F]{6}$/.test(s) ? s : '#808080';
+}
+
+function normalizeString(v, maxLen){
+  const s = String(v ?? '').trim();
+  if(!s) return '';
+  return maxLen ? s.slice(0, maxLen) : s;
+}
+
+function normalizePaint(raw){
+  const p = raw && typeof raw === 'object' ? raw : {};
+  const type = TYPES.includes(p.type) ? p.type : 'その他';
+  const brand = BRANDS.includes(p.brand) ? p.brand : 'その他';
+
+  const out = {
+    // 既存/将来の未知フィールドも保持
+    ...p,
+
+    id: Number.isInteger(p.id) ? p.id : Date.now(),
+    name: normalizeString(p.name, 80),
+    brand,
+    code: normalizeString(p.code, 40),
+    type,
+    count: clampInt(p.count, 0, 30, 0),
+    remaining: clampInt(p.remaining, 0, 100, 100),
+    color: normalizeColor(p.color),
+    photo: (typeof p.photo === 'string' ? p.photo : '')
+  };
+
+  return out;
+}
+
+function parseBackup(jsonText){
+  const obj = JSON.parse(jsonText);
+
+  // v1: 配列直下（旧形式）
+  if(Array.isArray(obj)){
+    return { app: BACKUP_APP, schema: 1, exportedAt: null, paints: obj };
+  }
+
+  // v2+ container: {app, schema, paints}
+  if(obj && typeof obj === 'object'){
+    const paints = Array.isArray(obj.paints) ? obj.paints : [];
+    const app = typeof obj.app === 'string' ? obj.app : BACKUP_APP;
+    const schema = Number(obj.schema ?? obj.version ?? 1); // 旧キーも拾う
+    const exportedAt = typeof obj.exportedAt === 'string' ? obj.exportedAt : null;
+    return { app, schema, exportedAt, paints, raw: obj };
+  }
+
+  throw Error('Invalid backup');
+}
+
+function dedupeIds(paints){
+  const used = new Set();
+  let seq = 0;
+  return paints.map(p=>{
+    let id = p.id;
+    if(!Number.isInteger(id)) id = Date.now() + (seq++);
+    while(used.has(id)) id = Date.now() + (seq++);
+    used.add(id);
+    return { ...p, id };
+  });
+}
+
+function migrateToCurrent(container){
+  // 将来 schema が自分より新しくても、最低限 paints を正規化して取り込む
+  const arr = Array.isArray(container.paints) ? container.paints : [];
+  const normalized = arr.map(normalizePaint).filter(p=>p.name); // name無は捨てる
+  return dedupeIds(normalized);
+}
+
+// === export (always container form) ====================================
 function exportData(){
-  const blob=new Blob([JSON.stringify({app:'PAINT STOCK',version:2,exportedAt:new Date().toISOString(),paints},null,2)],{type:'application/json'});
+  const backup = {
+    app: BACKUP_APP,
+    schema: BACKUP_SCHEMA,
+    version: 2, // 表示用（互換判定は schema）
+    exportedAt: new Date().toISOString(),
+    paints
+  };
+
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
   const a=document.createElement('a'),url=URL.createObjectURL(blob);
   a.href=url;
   a.download='paint-stock-backup-'+new Date().toISOString().slice(0,10)+'.json';
@@ -385,22 +477,19 @@ function exportData(){
   toast('写真を含むバックアップを書き出しました')
 }
 
+// === import (accept v1 array + any future schema container) ============
 function importData(file){
   const r=new FileReader();
   r.onload=()=>{
     try{
-      const obj=JSON.parse(r.result),a=Array.isArray(obj)?obj:obj.paints;
-      if(!Array.isArray(a)||!a.every(p=>
-        p&&Number.isInteger(p.id)&&typeof p.name==='string'&&
-        TYPES.includes(p.type)&&
-        Number.isInteger(p.count)&&p.count>=0&&p.count<=30&&
-        Number.isInteger(p.remaining)&&p.remaining>=0&&p.remaining<=100&&
-        /^#[0-9a-fA-F]{6}$/.test(p.color)&&
-        (!p.photo||typeof p.photo==='string')
-      )) throw Error();
+      const container = parseBackup(r.result);
+
+      // app名が違っても救いたい場合は許容（厳密にするならここでチェック）
+      const incoming = migrateToCurrent(container);
+      if(!incoming.length) throw Error();
 
       if(!confirm('現在の在庫データをバックアップ内容に置き換えます。よろしいですか？'))return;
-      paints=a;
+      paints=incoming;
       persist();
       renderList();
       toast('バックアップを復元しました')
