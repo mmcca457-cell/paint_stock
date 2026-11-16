@@ -77,14 +77,6 @@ header{display:flex;align-items:center;justify-content:space-between;margin:2px 
 <section id="listPage">
   <div class="searchrow">
     <input class="search" id="search" placeholder="塗料名・メーカー・色番号で検索">
-    <select class="sort" id="sort">
-      <option value="new">登録順</option>
-      <option value="type">種別順</option>
-      <option value="brand">メーカー順</option>
-      <option value="code">色番号・品番順</option>
-      <option value="name">塗料名順</option>
-      <option value="low">残量順</option>
-    </select>
   </div>
   <div class="filters" id="filters"></div>
   <div class="filtertools">
@@ -514,7 +506,7 @@ $('cancel').onclick=()=>setPage('list');
 $('back').onclick=()=>setPage('list');
 
 $('search').oninput=renderList;
-$('sort').onchange=renderList;
+// 並べ替えは常時、種別 → メーカー → 色番号・品番 → 塗料名順
 
 $('lowToggle').onclick=()=>{
   onlyLow=!onlyLow;
