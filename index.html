@@ -514,7 +514,7 @@ $('cancel').onclick=()=>setPage('list');
 $('back').onclick=()=>setPage('list');
 
 $('search').oninput=renderList;
-// 並べ替えは常時、種別 → メーカー → 色番号・品番 → 塗料名順
+$('sort').onchange=renderList;
 
 $('lowToggle').onclick=()=>{
   onlyLow=!onlyLow;
